@@ -152,15 +152,15 @@ pub mod dao {
             let caller = Self::env().caller();
             let proposal_error = self.proposals.get(proposal_id);
             
-            let total_supply = 100;/* build_call::<DefaultEnvironment>()
+            let total_supply = build_call::<DefaultEnvironment>()
             .call(self.governance_token)
             .gas_limit(5000000000)
             .exec_input(
                 ExecutionInput::new(Selector::new(ink::selector_bytes!("PSP22::total_supply")))
             )
             .returns::<Balance>()
-            .try_invoke().unwrap().unwrap(); */
-            let caller_balance = 25;/* build_call::<DefaultEnvironment>()
+            .try_invoke().unwrap().unwrap(); 
+            let caller_balance =  build_call::<DefaultEnvironment>()
             .call(self.governance_token)
             .gas_limit(5000000000)
             .exec_input(
@@ -168,8 +168,8 @@ pub mod dao {
                     .push_arg(caller),
             )
             .returns::<Balance>()
-            .try_invoke().unwrap().unwrap(); */
-            let weight_value = caller_balance * 100/ total_supply;
+            .try_invoke().unwrap().unwrap();
+            let weight_value: u64 = caller_balance as u64 * 100/ total_supply as u64;
             if proposal_error == None {
                 return Err(GovernorError::ProposalNotFound)
             }
