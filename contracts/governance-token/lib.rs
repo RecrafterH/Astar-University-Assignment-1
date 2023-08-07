@@ -2,7 +2,7 @@
         
 #[openbrush::implementation(PSP22, PSP22Metadata)]
 #[openbrush::contract]
-pub mod governanceToken {
+pub mod governance_token {
     use openbrush::traits::Storage;
     
 

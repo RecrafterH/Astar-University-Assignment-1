@@ -1,5 +1,5 @@
 [package]
-name = "governanceToken"
+name = "governance_token"
 version = "1.0.0"
 edition = "2021"
 authors = ["The best developer ever"]
@@ -15,12 +15,8 @@ scale-info = { version = "2.6", default-features = false, features = ["derive"],
 openbrush = { version = "4.0.0-beta", git = "https://github.com/727-Ventures/openbrush-contracts", default-features = false, features = ["psp22"] }
 
 [lib]
-name = "governanceToken"
+name = "governance_token"
 path = "lib.rs"
-crate-type = [
-    "cdylib",
-    "rlib"
-]
 
 
 [features]

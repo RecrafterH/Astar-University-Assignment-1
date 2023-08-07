@@ -11,12 +11,11 @@ scale = { package = "parity-scale-codec", version = "3", default-features = fals
 scale-info = { version = "2.5", default-features = false, features = ["derive"], optional = true }
 
 openbrush = { version = "4.0.0-beta", git = "https://github.com/727-Ventures/openbrush-contracts", default-features = false,  features = ["psp22", "ownable", "reentrancy_guard"]}
-governanceToken = { path = "../governance-token", default-features = false, features = ["ink-as-dependency"] }
+governance_token = { path = "../governance-token", default-features = false, features = ["ink-as-dependency"] }
 
 [lib]
 name = "dao"
 path = "lib.rs"
-crate-type = ["cdylib"]
 
 [features]
 default = ["std"]
@@ -25,7 +24,7 @@ std = [
     "scale/std",
     "scale-info/std",
     "openbrush/std",
-    "governanceToken/std",
+    "governance_token/std",
 ]
 ink-as-dependency = []
 

@@ -3,7 +3,6 @@
 #[ink::contract]
 pub mod dao {
     use ink::storage::Mapping;
-    use openbrush::contracts::traits::psp22::*;
     use scale::{
         Decode,
         Encode,
@@ -16,8 +15,8 @@ pub mod dao {
 
     const ONE_MINUTE: u64 = 60;
 
-    #[derive(Encode, Decode)]
-    #[cfg_attr(feature = "std", derive(Debug, PartialEq, Eq, scale_info::TypeInfo))]
+    #[derive(Encode, Decode, PartialEq)]
+    #[cfg_attr(feature = "std", derive(Debug, Eq, scale_info::TypeInfo))]
     pub enum VoteType {
         Against,
         For,
@@ -36,24 +35,11 @@ pub mod dao {
         QuorumNotReached
     }
 
-    #[derive(Copy, Clone, Debug, PartialEq, Eq, Encode, Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-    pub enum DaoError {
-        AmountShouldNotBeZero,
-        DurationError,
-        VotePeriodEnded,
-        AlreadyVoted,
-        ProposalAlreadyExecuted,
-        ProposalNotFound,
-        InsufficientBalance
-    }
-
-    #[derive(Encode, Decode)]
+    #[derive(Encode, Decode, PartialEq)]
     #[cfg_attr(
         feature = "std",
         derive(
             Debug,
-            PartialEq,
             Eq,
             scale_info::TypeInfo,
             ink::storage::traits::StorageLayout
@@ -68,12 +54,11 @@ pub mod dao {
         amount: Balance, 
     }
 
-    #[derive(Encode, Decode, Default)]
+    #[derive(Encode, Decode, Default, PartialEq)]
     #[cfg_attr(
         feature = "std",
         derive(
             Debug,
-            PartialEq,
             Eq,
             scale_info::TypeInfo,
             ink::storage::traits::StorageLayout
@@ -245,7 +230,9 @@ pub mod dao {
             }
 
             if number_for_votes > number_against_votes {
-                self.env().transfer(caller, proposal.amount);
+                if self.env().transfer(caller, proposal.amount).is_err() {
+                    panic!("requested transfer failed")
+                }
                 proposal.executed = true;
                 self.proposals.insert(proposal_id, &proposal);
             }
@@ -334,6 +321,29 @@ pub mod dao {
             assert_eq!(result, Ok(()));
             let execute = governor.execute(0);
             assert_eq!(execute, Err(GovernorError::QuorumNotReached));
+        }
+
+        #[ink::test]
+        fn execute_proposal_not_found() {
+            let mut governor = create_contract(1000);
+            let result = governor.execute(0);
+            assert_eq!(result, Err(GovernorError::ProposalNotFound)); 
+        }
+
+        #[ink::test]
+        fn propose_amount_should_not_be_zero() {
+            let accounts = default_accounts();
+            let mut governor = create_contract(1000);
+            let result = governor.propose(accounts.bob, 0, 1);
+            assert_eq!(result, Err(GovernorError::AmountShouldNotBeZero));
+        }
+
+        #[ink::test]
+        fn propose_duration_error() {
+            let accounts = default_accounts();
+            let mut governor = create_contract(1000);
+            let result = governor.propose(accounts.charlie, 100, 0);
+            assert_eq!(result, Err(GovernorError::DurationError));
         }
     }
 }
